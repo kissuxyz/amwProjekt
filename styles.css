@@ -1,0 +1,133 @@
+html{
+    font-family: calibri;
+    font-size: 18px;
+    
+    margin-left: 25%;
+    margin-right: 25%;
+
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+body {
+    background: rgba(252, 252, 252, 0.507);
+    background: linear-gradient(0deg, rgb(121, 41, 41) 0%, rgb(231, 176, 215) 100%);
+    background-attachment: fixed;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    width: 100%;
+    height: auto;
+    padding: 10px;
+    margin-bottom: 10px;
+
+    background-color: rgba(245, 84, 84, 0.342);
+    box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+
+    border: 1 solid ghostwhite;
+    border-radius: 40px;
+
+    text-align: center;
+    font-weight: bolder;
+    /* background-color: navy;
+    color: white;
+    text-align: center;
+    padding: 10px 0; */
+}
+ p{
+    text-align: center;
+ }
+ .center{
+    text-align: center;
+    list-style-position: inside;
+ }
+ .srodek{
+    text-align: center;
+    list-style-position: inside;
+ }
+main {
+    width: 100%;
+    height: auto;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+    background-color: rgba(255, 255, 255, 0.589);
+    box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+
+    border: 1 solid ghostwhite;
+    border-radius: 40px;
+}
+
+
+footer {
+    width: 100%;
+    height: auto;
+    padding: 10px;
+    margin-bottom: 10px;
+
+    background-color: rgba(245, 84, 84, 0.342);
+    box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+
+    border: 1 solid ghostwhite;
+    border-radius: 40px;
+
+    text-align: center;
+    font-weight: bolder;
+    /* background-color: navy;
+    color: white;
+    text-align: center;
+    padding: 10px 0; */
+}
+img{
+    width: 50px;
+    height: 50px;
+    padding: 10px 0;
+    float: right;
+}
+
+.tile {
+    width: 100%;
+    height: auto;
+    padding: 10px;
+    margin-bottom: 10px;
+
+    background-color: rgba(254, 255, 245, 0.623);
+    box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+
+    border: 1 solid ghostwhite;
+    border-radius: 40px;
+
+    text-align: center;
+    font-weight: bolder;
+    /* background-color: yellow;
+    padding: 20px;
+    margin: 20px;
+    border-radius: 10px;
+    text-align: center; */
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 20px;
+}
+
+nav ul li a {
+    color: navy;
+    text-decoration: none;
+}
+
+nav ul li a:hover {
+    text-decoration: underline;
+}
+ul{
+    text-align: center;
+}
+
+

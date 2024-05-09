@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logowanie</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Logowanie</h1>
+    </header>
+    <main>
+        <center> <a href="rejestracja.html"><input type="button" value="zarejestruj się"></a></center><br>
+        <form action="index.html" method="post" onsubmit="return validateLoginForm()">
+            <div class="center">
+                <label for="username">Nazwa użytkownika:</label><br>
+                <input type="text" id="username" name="username" required><br><br>
+            </div>
+            <div class="center">
+                <label for="password">Hasło:</label><br>
+                <input type="password" id="password" name="password" required><br><br>
+            </div>
+            <div class="center">
+                <input type="submit" value="Zaloguj">
+            </div>
+            <div id="error-message" class="center" style="color: red; display: none;"></div>
+        </form>
+    </main>
+    <footer>
+        <p>&copy; 2024 Strona egzaminacyjna</p>
+    </footer>
+
+    <script>
+        function validateLoginForm() {
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+
+            // Tutaj umieść swoją logikę weryfikacji
+            // Ta funkcja jest wywoływana, gdy użytkownik naciśnie przycisk "Zaloguj"
+            // Poniżej znajdziesz przykład symulacji sprawdzenia poprawności danych
+
+            // Jeśli dane są poprawne, zwróć true, aby formularz został wysłany
+            // Jeśli dane nie są poprawne, wyświetl komunikat o błędzie i zwróć false, aby formularz nie został wysłany
+
+            // Poniżej znajduje się przykładowa symulacja - sprawdzenie, czy nazwa użytkownika i hasło nie są puste
+            if (username.trim() !== "" && password.trim() !== "") {
+                return true; // Poprawne dane logowania, przekierowanie na stronę "index.html"
+            } else {
+                document.getElementById("error-message").innerText = "Proszę wprowadzić nazwę użytkownika i hasło.";
+                document.getElementById("error-message").style.display = "block";
+                return false; // Niepoprawne dane logowania, formularz nie zostanie wysłany
+            }
+        }
+    </script>
+</body>
+</html>
