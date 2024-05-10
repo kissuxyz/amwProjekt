@@ -47,23 +47,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <header>
         <h1>Rejestracja</h1>
     </header>
-    <section id="menu">
-        <section class="menu-select">
-            <a href="index.html">STRONA GŁÓWNA</a>
-        </section>
-        <section class="menu-select">
-            <a href="wybor testu.html">WYKONAJ TEST</a>
-        </section>
-        <section class="menu-select">
-            <a href="profil uzytkownika.html" >PROFIL</a>
-        </section>
-        <section class="menu-select">
-            <a href="faq.html">FAQ</a>
-        </section>
-        <section class="menu-select">
-            <a href="logowanie.html">WYLOGUJ SIĘ</a>
-        </section>
-    </section>
     <main>
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" onsubmit="return validateRegistration()">
             <div class="center">
