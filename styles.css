@@ -22,7 +22,7 @@ header {
     padding: 10px;
     margin-bottom: 10px;
 
-    background-color: rgba(245, 84, 84, 0.342);
+    background-color: rgba(214, 112, 112, 0.342);
     box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
 
     border: 1 solid ghostwhite;
@@ -59,7 +59,60 @@ main {
     border: 1 solid ghostwhite;
     border-radius: 40px;
 }
+#menu{
+    width: 100%;
+    height: auto;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 
+    background-color: rgba(214, 112, 112, 0.342);
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+
+    border: 1 solid ghostwhite;
+    border-radius: 40px;
+
+    display:flex;
+}
+.menu-select{
+    background-color: rgba(233, 210, 210, 0.342);
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+
+    margin: 10px;
+    padding: 5px;
+
+    border: 1 solid ghostwhite;
+    border-radius: 40px;
+
+    text-align: center;
+    width: 25%;
+
+    transition: all 0.3s ease 0s;
+}
+.menu-select:hover{
+    font-weight: 700 !important;
+    color: rgb(43, 43, 43);
+    letter-spacing: 3px;
+    background: none;
+    -webkit-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+    -moz-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+    transition: all 0.3s ease 0s;
+}
+/* #menu{
+    width: 100%;
+    height: auto;
+    padding: 10px;
+    margin-bottom: 10px;
+
+    background-color: rgba(214, 112, 112, 0.342);
+    box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+
+    border: 1 solid ghostwhite;
+    border-radius: 40px;
+
+    text-align: center;
+    font-weight: bolder;
+} */
 
 footer {
     width: 100%;
@@ -67,7 +120,7 @@ footer {
     padding: 10px;
     margin-bottom: 10px;
 
-    background-color: rgba(245, 84, 84, 0.342);
+    background-color: rgba(214, 112, 112, 0.342);
     box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
 
     border: 1 solid ghostwhite;
@@ -106,6 +159,20 @@ img{
     margin: 20px;
     border-radius: 10px;
     text-align: center; */
+}
+.tekst {
+    width: 100%;
+    height: auto;
+    padding: 10px;
+    margin-bottom: 10px;
+
+    background-color: rgba(254, 255, 245, 0.623);
+    box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+
+    border: 1 solid ghostwhite;
+    border-radius: 40px;
+
+    text-align: center;
 }
 
 nav ul {
