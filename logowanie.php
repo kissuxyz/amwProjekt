@@ -1,6 +1,8 @@
 <?php
 include 'db_connect.php';
 
+$errors = [];
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
@@ -17,14 +19,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: index.html");
         exit();
     } else {
-        echo "Nieprawidłowa nazwa użytkownika lub hasło.";
-        exit();
+        $errors[] = "Nieprawidłowa nazwa użytkownika lub hasło.";
     }
 
     $stmt->close();
     $conn->close();
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -32,6 +34,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logowanie</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -49,8 +57,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <div class="center">
                 <input type="submit" value="Zaloguj">
+                <!-- Przycisk "Zarejestruj się" -->
+                <a href="rejestracja.php"><button type="button">Zarejestruj się</button></a>
             </div>
-            <div id="error-message" class="center" style="color: red; display: none;"></div>
+            <?php if (!empty($errors)): ?>
+                <div class="error-message">
+                    <?php foreach ($errors as $error): ?>
+                        <p><?php echo $error; ?></p>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </form>
     </main>
     <footer>
@@ -59,19 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <script>
         function validateLoginForm() {
-            var username = document.getElementById("username").value;
-            var password = document.getElementById("password").value;
-
-            // Symulacja sprawdzania nazwy użytkownika i hasła.
-            // Możesz tutaj dodać swoją logikę weryfikacji, na przykład sprawdzając w pamięci lokalnej, czy dane są poprawne.
-
-            // Przykładowa symulacja - sprawdzenie, czy nazwa użytkownika to "admin", a hasło to "password".
-            if (username !== "admin" || password !== "password") {
-                document.getElementById("error-message").innerText = "Nieprawidłowa nazwa użytkownika lub hasło.";
-                document.getElementById("error-message").style.display = "block";
-                return false;
-            }
-
+            // Tutaj można dodać dodatkową walidację, jeśli to konieczne
             return true;
         }
     </script>

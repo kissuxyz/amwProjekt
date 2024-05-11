@@ -1,32 +1,46 @@
 <?php
 include 'db_connect.php';
 
+$errors = [];
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
     // Sprawdzenie czy nazwa użytkownika jest już w użyciu
-    $stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $stmt->store_result();
+    $stmt_check = $conn->prepare("SELECT id FROM users WHERE username = ?");
+    $stmt_check->bind_param("s", $username);
+    $stmt_check->execute();
+    $stmt_check->store_result();
 
-    if ($stmt->num_rows > 0) {
-        echo "Nazwa użytkownika jest już zajęta.";
+    if ($stmt_check->num_rows > 0) {
+        $errors[] = "Nazwa użytkownika jest już zajęta.";
+    }
+
+    // Sprawdzenie czy hasło spełnia kryteria
+    $policyRegex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,20}$/';
+    if (!preg_match($policyRegex, $_POST['password'])) {
+        $errors[] = "Hasło nie spełnia wymagań polityki hasła.";
+    }
+
+    // Sprawdzenie czy potwierdzenie hasła jest zgodne
+    if ($_POST['password'] !== $_POST['confirm_password']) {
+        $errors[] = "Potwierdzenie hasła nie pasuje.";
+    }
+
+    // Jeśli nie ma błędów, wstaw nowego użytkownika do bazy danych
+    if (empty($errors)) {
+        $stmt_insert = $conn->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
+        $stmt_insert->bind_param("ss", $username, $password);
+        $stmt_insert->execute();
+
+        header("Location: logowanie.php");
         exit();
     }
 
-    // Wstawienie nowego użytkownika do bazy danych
-    $stmt = $conn->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
-    $stmt->bind_param("ss", $username, $password);
-    $stmt->execute();
-
-    header("Location: logowanie.php");
-    exit();
-
-    $stmt->close();
-    $conn->close();
+    $stmt_check->close(); // Zamknij zapytanie
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="pl">
@@ -40,6 +54,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             font-size: 14px;
             text-align: center;
             margin-bottom: 20px;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -68,7 +86,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <input type="submit" value="Zarejestruj">
                 <a href="logowanie.php"><button type="button">Zaloguj się</button></a>
             </div>
-            <div id="error-message" class="center" style="color: red; display: none;"></div>
+            <?php if (!empty($errors)): ?>
+                <div class="error-message">
+                    <?php foreach ($errors as $error): ?>
+                        <p><?php echo $error; ?></p>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </form>
     </main>
     <footer>
@@ -77,7 +101,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <script>
         function validateRegistration() {
-            var username = document.getElementById("username").value;
             var password = document.getElementById("password").value;
             var confirmPassword = document.getElementById("confirm_password").value;
 

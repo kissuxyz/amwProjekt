@@ -1,49 +1,40 @@
+<?php
+session_start();
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Pobieranie danych z formularza
+    $score = 0;
+    $answers = $_POST;
+
+    // Klucz odpowiedzi dla testu nr 2
+    $key = ['1', '0', '3', '0', '2', '1', '1', '0', '2', '3'];
+
+    // Sprawdzanie poprawności odpowiedzi
+    foreach ($answers as $question => $answer) {
+        if (strpos($question, 'pytanie') !== false) {
+            $questionNumber = substr($question, -1); // Pobranie numeru pytania
+            if ($answer == $key[$questionNumber - 1]) {
+                $score++; // Zwiększanie wyniku o 1, jeśli odpowiedź jest poprawna
+            }
+        }
+    }
+
+    // Zapisywanie wyniku w sesji
+    $_SESSION['test2_score'] = $score;
+
+    // Przekierowanie do profilu użytkownika
+    header("Location: profil_uzytkownika.php");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Egzamin teoretyczny inf 04</title>
+    <title>Egzamin teoretyczny inf04</title>
     <link rel="stylesheet" href="styles.css">
-
-    <script type="text/javascript">
-        var iloscpytan = 10;
-        var wynik = 0;
-        var wynikpokaz = 0;
-        var pytania = new Array(iloscpytan);
-        var klucz = ['1', '0', '3', '0', '2', '1', '1', '0', '2', '3'];
-
-        function pobierz() {
-            for (var i = 0; i < iloscpytan; i++) {
-                var selectedAnswer = '';
-                var radioButtons = document.getElementsByName("pytanie" + (i + 1));
-                for (var j = 0; j < radioButtons.length; j++) {
-                    if (radioButtons[j].checked) {
-                        selectedAnswer = radioButtons[j].value;
-                        break;
-                    }
-                }
-                pytania[i] = selectedAnswer;
-            }
-        }
-
-        function sprawdz() {
-            for (var i = 0; i < iloscpytan; i++) {
-                if (pytania[i] == klucz[i]) {
-                    wynik++;
-                }
-            }
-        }
-
-        function main() {
-            pobierz();
-            sprawdz();
-            wynikpokaz = Math.round((wynik / iloscpytan) * 100);
-            alert(wynikpokaz + "% (" + wynik + " odpowiedzi poprawnych)");
-            wynik = 0;
-            wynikpokaz = 0;
-        }
-    </script>
 </head>
 <body>
 <header>
@@ -56,18 +47,18 @@
             <a href="wybor testu.html">WYKONAJ TEST</a>
         </section>
         <section class="menu-select">
-            <a href="profil uzytkownika.html" >PROFIL</a>
+            <a href="profil uzytkownika.php" >PROFIL</a>
         </section>
         <section class="menu-select">
             <a href="faq.html">FAQ</a>
         </section>
         <section class="menu-select">
-            <a href="logowanie.html">WYLOGUJ SIĘ</a>
+            <a href="logowanie.php">WYLOGUJ SIĘ</a>
         </section>
     </section>
 </header>
 <main>
-    <form name="ankieta" id="test" action="javascript:void(0);" onsubmit="main();">
+    <form name="ankieta" id="test" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
         <center>
             Imię:<input type="text"><br>
             Nazwisko: <input type="text"><br>
@@ -137,7 +128,7 @@
         <input name="pytanie10" value="3" type="radio">W spiralnym<br>
         </center>
         <br><br>
-        <center><input type="submit" value="sprawdź wynik"></center>
+        <Center><input type="submit" value="Sprawdź wynik"></center>
     </form>
 </main>
 <footer>
