@@ -1,9 +1,10 @@
 <?php
 session_start();
 
+$score = 0;
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Pobieranie danych z formularza
-    $score = 0;
     $answers = $_POST;
 
     // Klucz odpowiedzi dla testu nr 2
@@ -12,7 +13,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Sprawdzanie poprawności odpowiedzi
     foreach ($answers as $question => $answer) {
         if (strpos($question, 'pytanie') !== false) {
-            $questionNumber = substr($question, -1); // Pobranie numeru pytania
+            $questionParts = explode('pytanie', $question);
+            $questionNumber = end($questionParts); // Pobranie numeru pytania
+
             if ($answer == $key[$questionNumber - 1]) {
                 $score++; // Zwiększanie wyniku o 1, jeśli odpowiedź jest poprawna
             }
@@ -21,10 +24,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Zapisywanie wyniku w sesji
     $_SESSION['test2_score'] = $score;
-
-    // Przekierowanie do profilu użytkownika
-    header("Location: profil_uzytkownika.php");
-    exit();
 }
 ?>
 
@@ -39,7 +38,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
 <header>
     <h1>Egzamin teoretyczny inf04</h1>
-    <section id="menu">
+</header>
+<section id="menu">
         <section class="menu-select">
             <a href="index.html">STRONA GŁÓWNA</a>
         </section>
@@ -56,7 +56,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <a href="logowanie.php">WYLOGUJ SIĘ</a>
         </section>
     </section>
-</header>
 <main>
     <form name="ankieta" id="test" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
         <center>
@@ -128,11 +127,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <input name="pytanie10" value="3" type="radio">W spiralnym<br>
         </center>
         <br><br>
-        <Center><input type="submit" value="Sprawdź wynik"></center>
+        <Center><input type="submit" value="Sprawdź wynik" onclick="showResult()"></center>
     </form>
 </main>
 <footer>
     <p>&copy; 2024 Strona egzaminacyjna</p>
 </footer>
+<script>
+function showResult() {
+    var score = <?php echo $score; ?>; // Pobranie wyniku testu z PHP
+    var totalQuestions = 10; // Całkowita liczba pytań w teście
+    var percentage = (score / totalQuestions) * 100; // Obliczenie procentu
+
+    // Wyświetlenie okna pop z wynikiem
+    alert("Twój wynik to: " + percentage.toFixed(2) + "%");
+}
+</script>
 </body>
 </html>
