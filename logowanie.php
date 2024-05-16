@@ -19,13 +19,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: index.html");
         exit();
     } else {
-        $errors[] = "Nieprawidłowa nazwa użytkownika lub hasło.";
+        // $errors[] = "Nieprawidłowa nazwa użytkownika lub hasło.";
+        echo "<script>alert('Nieprawidłowa nazwa użytkownika lub hasło.');</script>";
     }
 
     $stmt->close();
     $conn->close();
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="pl">

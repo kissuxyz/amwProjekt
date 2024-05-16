@@ -1,32 +1,3 @@
-<?php
-session_start();
-
-$score = 0;
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Pobieranie danych z formularza
-    $answers = $_POST;
-
-    // Klucz odpowiedzi dla testu nr 1
-    $key = ['2', '3', '2', '0', '1', '2', '0', '3', '2', '1'];
-
-    // Sprawdzanie poprawności odpowiedzi
-    foreach ($answers as $question => $answer) {
-        if (strpos($question, 'pytanie') !== false) {
-            $questionParts = explode('pytanie', $question);
-            $questionNumber = end($questionParts); // Pobranie numeru pytania
-
-            if ($answer == $key[$questionNumber - 1]) {
-                $score++; // Zwiększanie wyniku o 1, jeśli odpowiedź jest poprawna
-            }
-        }
-    }
-
-    // Zapisywanie wyniku w sesji
-    $_SESSION['test1_score'] = $score;
-}
-?>
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -40,103 +11,81 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <h1>Egzamin teoretyczny inf03</h1>
 </header>
 <section id="menu">
-        <section class="menu-select">
-            <a href="index.html">STRONA GŁÓWNA</a>
-        </section>
-        <section class="menu-select">
-            <a href="wybor testu.html">WYKONAJ TEST</a>
-        </section>
-        <section class="menu-select">
-            <a href="profil uzytkownika.php" >PROFIL</a>
-        </section>
-        <section class="menu-select">
-            <a href="faq.html">FAQ</a>
-        </section>
-        <section class="menu-select">
-            <a href="logowanie.php">WYLOGUJ SIĘ</a>
-        </section>
+    <section class="menu-select">
+        <a href="index.html">STRONA GŁÓWNA</a>
     </section>
+    <section class="menu-select">
+        <a href="wybor testu.html">WYKONAJ TEST</a>
+    </section>
+    <section class="menu-select">
+        <a href="profil uzytkownika.php">PROFIL</a>
+    </section>
+    <section class="menu-select">
+        <a href="faq.html">FAQ</a>
+    </section>
+    <section class="menu-select">
+        <a href="logowanie.php">WYLOGUJ SIĘ</a>
+    </section>
+</section>
 <main>
-    <form name="ankieta" id="test" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-        <center>
-            Imię:<input type="text"><br>
-            Nazwisko: <input type="text"><br>
-            Płeć:
-            <select><option value="mężczyzna">mężczyzna</option>
-                <option value="kobieta">kobieta</option>
-                <option value="inna">inna</option></select><br>
+    <?php
+    include 'db_connect.php';
 
-            <p><b>Pogrubienie tekstu za pomocą znacznika <'b> można uzyskać także przy wykorzystaniu właściwości CSS</b></p>
-            <input name="pytanie1" value="0" type="radio"> font-size<br>
-            <input name="pytanie1" value="1" type="radio"> text-size<br>
-            <input name="pytanie1" value="2" type="radio"> font-weight<br>
-            <input name="pytanie1" value="3" type="radio"> text-weight<br>
+    // Połączenie z bazą danych
+    $servername = "localhost";
+    $username = "root"; // Wprowadź swoją nazwę użytkownika bazy danych
+    $password = ""; // Wprowadź swoje hasło do bazy danych
+    $dbname = "uzytkownicy"; // Tutaj wprowadź nazwę bazy danych
 
-            <p><b>Które wyrażenie logiczne należy zastosować w języku JavaScript, aby wykonać operacje tylko dla dowolnych liczb ujemnych z przedziału jednostronnie domkniętego <-200,-100)?</b></p>
-            <input name="pytanie2" value="0" type="radio"> (liczba <=-200) || (liczba>-100)<br>
-            <input name="pytanie2" value="1" type="radio"> (liczba >=-200) || (liczba>-100)<br>
-            <input name="pytanie2" value="2" type="radio"> (liczba <=-200) && (liczba<-100)<br>
-            <input name="pytanie2" value="3" type="radio"> (liczba >=-200) && (liczba<-100)<br>
+    $conn = new mysqli($servername, $username, $password, $dbname);
 
-            <p><b>Które wyrażenie logiczne w języku PHP sprawdza, czy zmienna1 należy do przedziału jednostronnie domkniętego <-5, 10)?</b></p>
-        <input name="pytanie3" value="0" type="radio"> $zmienna1 <= -5 && $zmienna1 < 10<br>
-        <input name="pytanie3" value="1" type="radio"> $zmienna1 >= -5 || $zmienna1 < 10<br>
-        <input name="pytanie3" value="2" type="radio"> $zmienna1 >= -5 && $zmienna1 < 10<br>
-        <input name="pytanie3" value="3" type="radio"> $zmienna1 <= -5 || $zmienna1 < 10<br>
+    // Sprawdzenie połączenia
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
 
-        <p><b>Aby podczas tworzenia tabeli utworzyć klucz obcy na wielu kolumnach, należy użyć polecenia</b></p>
-        <input name="pytanie4" value="0" type="radio"> CONSTRAINT fk_osoba_uczen FOREIGN KEY (nazwisko, imie) REFERENCES osoby (nazwisko,imie)<br>
-        <input name="pytanie4" value="1" type="radio"> CONSTRAINT(nazwisko,imie) FOREIGN KEY REFERENCES osoby (nazwisko, imie)<br>
-        <input name="pytanie4" value="2" type="radio"> CONSTRAINT fk_osoba_uczen FOREIGN KEY ON (nazwisko, imie) REFERENCES osoby (nazwisko,imie)<br>
-        <input name="pytanie4" value="3" type="radio"> CONSTRAINT(nazwisko,imie) FOREIGN REFERENCES KEY osoby (nazwisko, imie)<br>
+    // Zapytanie SQL dla 40 losowych pytań, które nie zostały jeszcze wybrane
+    $sql = "SELECT * FROM questions ORDER BY RAND() LIMIT 40";
+    $result = $conn->query($sql);
 
-        <p><b>Które stwierdzenie odnosi się do skalowania obrazu?</b></p>
-        <input name="pytanie5" value="0" type="radio">Łączy lub odejmuje kształty<br>
-        <input name="pytanie5" value="1" type="radio">Powoduje zmianę rozmiaru obrazu bez zmieniania ważnej zawartości wizualnej<br>
-        <input name="pytanie5" value="2" type="radio">Polega na zmianie sposobu zapisu obrazu tak, aby zmienić sposób kompresji<br>
-        <input name="pytanie5" value="3" type="radio">Powoduje wycięcie z oryginalnego obrazu określonego jego fragmentu z celu uzyskania optymalnego widoku<br>
+    // Sprawdzenie czy są wyniki
+    if ($result && $result->num_rows === 40) {
+        echo '<form name="ankieta" id="test" action="' . htmlspecialchars($_SERVER["PHP_SELF"]) . '" method="post">';
+        echo '<center>';
+        while($row = $result->fetch_assoc()) {
+            echo "<p><b>" . $row["question_text"] . "</b></p>";
+            echo "<input name=\"pytanie" . $row["id"] . "\" value=\"0\" type=\"radio\">" . $row["answer1"] . "<br>";
+            echo "<input name=\"pytanie" . $row["id"] . "\" value=\"1\" type=\"radio\">" . $row["answer2"] . "<br>";
+            echo "<input name=\"pytanie" . $row["id"] . "\" value=\"2\" type=\"radio\">" . $row["answer3"] . "<br>";
+            echo "<input name=\"pytanie" . $row["id"] . "\" value=\"3\" type=\"radio\">" . $row["answer4"] . "<br>";
+        }
+        echo '</center>';
+        echo '<br><br>';
+        echo '<center><input type="button" value="Sprawdź wynik" onclick="showResult()"></center>';
+        echo '</form>';
+    } else {
+        echo "Nie można wyświetlić pytań. Spróbuj ponownie później.";
+    }
 
-        <p><b>Który z wymienionych znaczników należy do części <'head> dokumentu HTML?</b></p>
-        <input name="pytanie6" value="0" type="radio"><'img><br>
-        <input name="pytanie6" value="1" type="radio"><'span><br>
-        <input name="pytanie6" value="2" type="radio"><'title><br>
-        <input name="pytanie6" value="3" type="radio"><'section><br>
-
-        <p><b>Językami programowania działającymi po stronie serwera są:</b></p>
-        <input name="pytanie7" value="0" type="radio">Java, C#, Python, Ruby, PHP<br>
-        <input name="pytanie7" value="1" type="radio">Java, C#, AJAX, Ruby, PHP<br>
-        <input name="pytanie7" value="2" type="radio">Java, C#, Python, ActionScript, PHP<br>
-        <input name="pytanie7" value="3" type="radio">C#, Python, Ruby, PHP, JavaScript<br>
-          
-        <p><b>Funkcja drzewo kontekstowe edytor WYSIWYG Adobe Dreamweaver służy do</b></p>
-        <input name="pytanie8" value="0" type="radio">definiowania kaskadowych arkuszy stylów dołączonych do witryny<br>
-        <input name="pytanie8" value="1" type="radio">tworzenia szablonu strony internetowej<br>
-        <input name="pytanie8" value="2" type="radio">formatowanie tekstu przy pomocy dostępnych znaczników<br>
-        <input name="pytanie8" value="3" type="radio">wyświetlania interaktywnego drzewa struktury HTML dla zawartości statycznej i dynamicznej<br>
-          
-        <p><b>Który z wymienionych formatów umożliwia zapis dźwięku i obrazu?</b></p>
-        <input name="pytanie9" value="0" type="radio">MP3<br>
-        <input name="pytanie9" value="1" type="radio">PNG<br>
-        <input name="pytanie9" value="2" type="radio">MP4<br>
-        <input name="pytanie9" value="3" type="radio">WAV<br>
-          
-        <p><b>Kaskadowe arkusze stylów tworzy się w celu</b></p>
-        <input name="pytanie10" value="0" type="radio">ułatwienia użytkownikowi nawigacji<br>
-        <input name="pytanie10" value="1" type="radio">definiowania sposobu formatowania elementów strony internetowej<br>
-        <input name="pytanie10" value="2" type="radio">uzupełnienia strony internetowej o treści tekstowe<br>
-        <input name="pytanie10" value="3" type="radio">przyspieszenia wyświetlania grafiki na stronie internetowej<br>
-        </center>
-        <br><br>
-        <center><input type="submit" value="Sprawdź wynik" onclick="showResult()"></center>
-    </form>
+    $conn->close();
+    ?>
 </main>
 <footer>
     <p>&copy; 2024 Strona egzaminacyjna</p>
 </footer>
 <script>
 function showResult() {
-    var score = <?php echo $score; ?>; // Pobranie wyniku testu z PHP
-    var totalQuestions = 10; // Całkowita liczba pytań w teście
+    var totalQuestions = 40; // Całkowita liczba pytań w teście
+    var score = 0;
+
+    // Sprawdzanie, ile odpowiedzi jest poprawnych
+    for (var i = 1; i <= totalQuestions; i++) {
+        var selectedAnswer = document.querySelector('input[name="pytanie' + i + '"]:checked');
+        if (selectedAnswer !== null && selectedAnswer.value == "1") {
+            score++;
+        }
+    }
+
     var percentage = (score / totalQuestions) * 100; // Obliczenie procentu
 
     // Wyświetlenie okna pop z wynikiem
