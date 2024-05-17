@@ -28,45 +28,85 @@
     </section>
 </section>
 <main>
-    <form name="ankieta" id="test" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-        <center>
-            <!-- Tutaj pytania pobrane z bazy danych -->
-            <?php
-            if ($result->num_rows > 0) {
-                while($row = $result->fetch_assoc()) {
-                    echo "<p><b>" . $row["question_text"] . "</b></p>";
-                    echo "<input name=\"pytanie" . $row["id"] . "\" value=\"0\" type=\"radio\">" . $row["answer1"] . "<br>";
-                    echo "<input name=\"pytanie" . $row["id"] . "\" value=\"1\" type=\"radio\">" . $row["answer2"] . "<br>";
-                    echo "<input name=\"pytanie" . $row["id"] . "\" value=\"2\" type=\"radio\">" . $row["answer3"] . "<br>";
-                    echo "<input name=\"pytanie" . $row["id"] . "\" value=\"3\" type=\"radio\">" . $row["answer4"] . "<br>";
-                }
-            } else {
-                echo "Brak pytań w bazie danych.";
-            }
-            ?>
-        </center>
-        <br><br>
-        <Center><input type="submit" value="Sprawdź wynik"></center>
-    </form>
+<?php
+session_start();
+include 'db_connect.php';
+
+// Sprawdzenie połączenia
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Zapytanie SQL dla 40 losowych pytań
+$sql = "SELECT * FROM questions2 ORDER BY RAND() LIMIT 40";
+$result = $conn->query($sql);
+
+// Sprawdzenie czy są wyniki
+if ($result && $result->num_rows === 40) {
+    echo '<form name="ankieta" id="test" action="' . htmlspecialchars($_SERVER["PHP_SELF"]) . '" method="post">';
+    echo '<center>';
+    while($row = $result->fetch_assoc()) {
+        echo "<p><b>" . $row["question_text"] . "</b></p>";
+        echo "<input name=\"pytanie" . $row["id"] . "\" value=\"0\" type=\"radio\">" . $row["answer1"] . "<br>";
+        echo "<input name=\"pytanie" . $row["id"] . "\" value=\"1\" type=\"radio\">" . $row["answer2"] . "<br>";
+        echo "<input name=\"pytanie" . $row["id"] . "\" value=\"2\" type=\"radio\">" . $row["answer3"] . "<br>";
+        echo "<input name=\"pytanie" . $row["id"] . "\" value=\"3\" type=\"radio\">" . $row["answer4"] . "<br>";
+    }
+    echo '</center>';
+    echo '<br><br>';
+    echo '<center><input type="submit" value="Sprawdź wynik"></center>';
+    echo '</form>';
+} else {
+    echo "Nie można wyświetlić pytań. Spróbuj ponownie później.";
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $totalQuestions = 40;
+    $score = 0;
+
+    foreach ($_POST as $key => $value) {
+        if (strpos($key, 'pytanie') === 0 && $value == "1") {
+            $score++;
+        }
+    }
+
+    $percentage = ($score / $totalQuestions) * 100;
+
+    // Zapisywanie wyniku do bazy danych
+    $username = $_SESSION['username'];
+    $test_type = 'inf04';
+    $stmt = $conn->prepare("INSERT INTO test_results (username, test_type, score) VALUES (?, ?, ?)");
+    $stmt->bind_param("ssd", $username, $test_type, $percentage);
+    $stmt->execute();
+    $stmt->close();
+
+    echo "<script>alert('Twój wynik to: " . $percentage . "%');</script>";
+}
+
+$conn->close();
+?>
+
+
 </main>
 <footer>
     <p>&copy; 2024 Strona egzaminacyjna</p>
 </footer>
 <script>
 function showResult() {
-    var totalQuestions = <?php echo $result->num_rows; ?>;
+    var totalQuestions = 40; // Całkowita liczba pytań w teście
     var score = 0;
-    var answers = document.forms["ankieta"];
-    
-    for (var i = 0; i < totalQuestions; i++) {
-        var questionName = "pytanie" + (i + 1);
-        var selectedAnswer = answers.elements[questionName].value;
-        if (selectedAnswer == "<?php echo $row['correct_answer']; ?>") {
+
+    // Sprawdzanie, ile odpowiedzi jest poprawnych
+    for (var i = 1; i <= totalQuestions; i++) {
+        var selectedAnswer = document.querySelector('input[name="pytanie' + i + '"]:checked');
+        if (selectedAnswer !== null && selectedAnswer.value == "1") {
             score++;
         }
     }
-    
-    var percentage = (score / totalQuestions) * 100;
+
+    var percentage = (score / totalQuestions) * 100; // Obliczenie procentu
+
+    // Wyświetlenie okna pop z wynikiem
     alert("Twój wynik to: " + percentage.toFixed(2) + "%");
 }
 </script>

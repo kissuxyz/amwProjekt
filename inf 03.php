@@ -28,47 +28,64 @@
     </section>
 </section>
 <main>
-    <?php
-    include 'db_connect.php';
+<?php
+session_start();
+include 'db_connect.php';
 
-    // Połączenie z bazą danych
-    $servername = "localhost";
-    $username = "root"; // Wprowadź swoją nazwę użytkownika bazy danych
-    $password = ""; // Wprowadź swoje hasło do bazy danych
-    $dbname = "uzytkownicy"; // Tutaj wprowadź nazwę bazy danych
+// Sprawdzenie połączenia
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
-    $conn = new mysqli($servername, $username, $password, $dbname);
+// Zapytanie SQL dla 40 losowych pytań
+$sql = "SELECT * FROM questions ORDER BY RAND() LIMIT 40";
+$result = $conn->query($sql);
 
-    // Sprawdzenie połączenia
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
+// Sprawdzenie czy są wyniki
+if ($result && $result->num_rows === 40) {
+    echo '<form name="ankieta" id="test" action="' . htmlspecialchars($_SERVER["PHP_SELF"]) . '" method="post">';
+    echo '<center>';
+    while($row = $result->fetch_assoc()) {
+        echo "<p><b>" . $row["question_text"] . "</b></p>";
+        echo "<input name=\"pytanie" . $row["id"] . "\" value=\"0\" type=\"radio\">" . $row["answer1"] . "<br>";
+        echo "<input name=\"pytanie" . $row["id"] . "\" value=\"1\" type=\"radio\">" . $row["answer2"] . "<br>";
+        echo "<input name=\"pytanie" . $row["id"] . "\" value=\"2\" type=\"radio\">" . $row["answer3"] . "<br>";
+        echo "<input name=\"pytanie" . $row["id"] . "\" value=\"3\" type=\"radio\">" . $row["answer4"] . "<br>";
     }
+    echo '</center>';
+    echo '<br><br>';
+    echo '<center><input type="submit" value="Sprawdź wynik"></center>';
+    echo '</form>';
+} else {
+    echo "Nie można wyświetlić pytań. Spróbuj ponownie później.";
+}
 
-    // Zapytanie SQL dla 40 losowych pytań, które nie zostały jeszcze wybrane
-    $sql = "SELECT * FROM questions ORDER BY RAND() LIMIT 40";
-    $result = $conn->query($sql);
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $totalQuestions = 40;
+    $score = 0;
 
-    // Sprawdzenie czy są wyniki
-    if ($result && $result->num_rows === 40) {
-        echo '<form name="ankieta" id="test" action="' . htmlspecialchars($_SERVER["PHP_SELF"]) . '" method="post">';
-        echo '<center>';
-        while($row = $result->fetch_assoc()) {
-            echo "<p><b>" . $row["question_text"] . "</b></p>";
-            echo "<input name=\"pytanie" . $row["id"] . "\" value=\"0\" type=\"radio\">" . $row["answer1"] . "<br>";
-            echo "<input name=\"pytanie" . $row["id"] . "\" value=\"1\" type=\"radio\">" . $row["answer2"] . "<br>";
-            echo "<input name=\"pytanie" . $row["id"] . "\" value=\"2\" type=\"radio\">" . $row["answer3"] . "<br>";
-            echo "<input name=\"pytanie" . $row["id"] . "\" value=\"3\" type=\"radio\">" . $row["answer4"] . "<br>";
+    foreach ($_POST as $key => $value) {
+        if (strpos($key, 'pytanie') === 0 && $value == "1") {
+            $score++;
         }
-        echo '</center>';
-        echo '<br><br>';
-        echo '<center><input type="button" value="Sprawdź wynik" onclick="showResult()"></center>';
-        echo '</form>';
-    } else {
-        echo "Nie można wyświetlić pytań. Spróbuj ponownie później.";
     }
 
-    $conn->close();
-    ?>
+    $percentage = ($score / $totalQuestions) * 100;
+
+    // Zapisywanie wyniku do bazy danych
+    $username = $_SESSION['username'];
+    $test_type = 'inf03';
+    $stmt = $conn->prepare("INSERT INTO test_results (username, test_type, score) VALUES (?, ?, ?)");
+    $stmt->bind_param("ssd", $username, $test_type, $percentage);
+    $stmt->execute();
+    $stmt->close();
+
+    echo "<script>alert('Twój wynik to: " . $percentage . "%');</script>";
+}
+
+$conn->close();
+?>
+
 </main>
 <footer>
     <p>&copy; 2024 Strona egzaminacyjna</p>

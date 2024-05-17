@@ -1,5 +1,11 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 session_start();
+include 'db_connect.php';
+
+var_dump($_SESSION['username']); // Sprawdzamy, czy username jest ustawione w sesji
 
 // Sprawdzamy, czy użytkownik jest zalogowany
 if (!isset($_SESSION['username'])) {
@@ -7,14 +13,16 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 
-// Odczytujemy wyniki testów z sesji
-$test1_score = isset($_SESSION['test1_score']) ? $_SESSION['test1_score'] : 0;
-$test2_score = isset($_SESSION['test2_score']) ? $_SESSION['test2_score'] : 0;
+$username = $_SESSION['username'];
 
-// Usuwamy wyniki z sesji
-unset($_SESSION['test1_score']);
-unset($_SESSION['test2_score']);
+// Zapytanie SQL do pobrania wyników testów użytkownika
+$sql = "SELECT test_type, score, test_date FROM test_results WHERE username = ? ORDER BY test_date DESC";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $username);
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="pl">
@@ -27,35 +35,49 @@ unset($_SESSION['test2_score']);
 <body>
 <header>
     <h1>Profil użytkownika</h1>
-    <!-- Nagłówek strony -->
 </header>
 <section id="menu">
-        <section class="menu-select">
-            <a href="index.html" >STRONA GŁÓWNA</a>
-        </section>
-        <section class="menu-select">
-            <a href="wybor testu.html" >WYKONAJ TEST</a>
-        </section>
-        <section class="menu-select">
-            <a href="profil uzytkownika.php" >PROFIL</a>
-        </section>
-        <section class="menu-select">
-            <a href="faq.html">FAQ</a>
-        </section>
-        <section class="menu-select">
-            <a href="logowanie.php">WYLOGUJ SIĘ</a>
-        </section>
+    <section class="menu-select">
+        <a href="index.html">STRONA GŁÓWNA</a>
     </section>
+    <section class="menu-select">
+        <a href="wybor testu.html">WYKONAJ TEST</a>
+    </section>
+    <section class="menu-select">
+        <a href="profil uzytkownika.php">PROFIL</a>
+    </section>
+    <section class="menu-select">
+        <a href="faq.html">FAQ</a>
+    </section>
+    <section class="menu-select">
+        <a href="logowanie.php">WYLOGUJ SIĘ</a>
+    </section>
+</section>
 <main>
     <section id="user-info">
         <h2>Informacje o użytkowniku:</h2>
-        <!-- Wyświetlanie informacji o użytkowniku -->
-        <!-- ... -->
+        <p>Nazwa użytkownika: <?php echo htmlspecialchars($username); ?></p>
     </section>
     <section id="test-results">
         <h2>Wyniki testów:</h2>
-        <p>Test nr 1: <?php echo $test1_score; ?>/10</p>
-        <p>Test nr 2: <?php echo $test2_score; ?>/10</p>
+        <?php
+        if ($result->num_rows > 0) {
+            echo '<table>';
+            echo '<tr><th>Typ testu</th><th>Wynik (%)</th><th>Data wykonania</th></tr>';
+            while ($row = $result->fetch_assoc()) {
+                echo '<tr>';
+                echo '<td>' . htmlspecialchars($row['test_type']) . '</td>';
+                echo '<td>' . htmlspecialchars($row['score']) . '</td>';
+                echo '<td>' . htmlspecialchars($row['test_date']) . '</td>';
+                echo '</tr>';
+            }
+            echo '</table>';
+        } else {
+            echo '<p>Brak wyników do wyświetlenia.</p>';
+        }
+        $stmt->close();
+        $conn->close();
+        ?>
     </section>
 </main>
 <footer>
